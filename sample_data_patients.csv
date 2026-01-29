@@ -1,0 +1,6 @@
+patient_code,full_name,date_of_birth,gender,phone,address,email
+BN001,Nguyễn Văn A,15/03/1990,Nam,0912345678,123 Đường ABC Hà Nội,nguyenvana@email.com
+BN002,Trần Thị B,20/05/1985,Nữ,0987654321,456 Đường XYZ TP.HCM,tranthib@email.com
+BN003,Lê Văn C,10/12/1995,Nam,0909123456,789 Đường DEF Đà Nẵng,levanc@email.com
+BN004,Phạm Thị D,25/08/1988,Nữ,0911222333,321 Đường GHI Cần Thơ,phamthid@email.com
+BN005,Hoàng Văn E,30/01/1992,Nam,0922333444,654 Đường JKL Hải Phòng,hoangvane@email.com

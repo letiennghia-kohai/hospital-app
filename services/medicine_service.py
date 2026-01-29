@@ -17,21 +17,26 @@ class MedicineService:
     # ===== Medicine Catalog Management =====
     
     def create_medicine(self, name: str, category: str = None,
-                       unit: str = None, description: str = None,
-                       active: bool = True) -> Medicine:
+                       unit: str = None, description: str = None) -> Medicine:
         """Create a new medicine"""
-        with self.db_manager.session_scope() as session:
+        session = self.db_manager.get_session()
+        try:
             medicine = Medicine(
                 name=name,
                 category=category,
                 unit=unit,
                 description=description,
-                active=active
+                active=True  # Default to active when creating
             )
             session.add(medicine)
-            session.flush()
+            session.commit()  # CRITICAL: Commit to save to database
             session.refresh(medicine)
             return medicine
+        except Exception as e:
+            session.rollback()
+            raise e
+        finally:
+            session.close()
     
     def get_medicine_by_id(self, medicine_id: int) -> Optional[Medicine]:
         """Get medicine by ID"""

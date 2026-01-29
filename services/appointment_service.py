@@ -35,6 +35,41 @@ class AppointmentService:
             session.refresh(appointment)
             return appointment
     
+    def get_all_appointments(self) -> List[Appointment]:
+        """Get all appointments with patient info"""
+        session = self.db_manager.get_session()
+        try:
+            today = date.today()
+            appointments = session.query(Appointment)\
+                .options(joinedload(Appointment.patient))\
+                .order_by(Appointment.appointment_date.desc())\
+                .all()
+            
+            # Update overdue status before returning
+            for appointment in appointments:
+                if (appointment.status == "PENDING" and 
+                    appointment.appointment_date < today):
+                    appointment.status = "OVERDUE"
+            
+            session.commit()
+            
+            # Force load all attributes before expunge to avoid detached errors
+            for appointment in appointments:
+                # Access all attributes to load them into memory
+                _ = appointment.id
+                _ = appointment.patient_id
+                _ = appointment.appointment_date
+                _ = appointment.reason
+                _ = appointment.status
+                _ = appointment.notes
+                if appointment.patient:
+                    _ = appointment.patient.full_name
+                session.expunge(appointment)
+            
+            return appointments
+        finally:
+            session.close()
+    
     def get_appointment_by_id(self, appointment_id: int) -> Optional[Appointment]:
         """Get appointment by ID"""
         session = self.db_manager.get_session()
@@ -77,42 +112,80 @@ class AppointmentService:
         """Get appointments within a date range"""
         session = self.db_manager.get_session()
         try:
-            return session.query(Appointment)\
+            today = date.today()
+            appointments = session.query(Appointment)\
                 .options(joinedload(Appointment.patient))\
                 .filter(and_(
                     Appointment.appointment_date >= start_date,
                     Appointment.appointment_date <= end_date
                 ))\
-                .filter(Appointment.status != "CANCELLED")\
                 .order_by(Appointment.appointment_date)\
                 .all()
+            
+            # Update overdue status before returning
+            for appointment in appointments:
+                if (appointment.status == "PENDING" and 
+                    appointment.appointment_date < today):
+                    appointment.status = "OVERDUE"
+            
+            session.commit()
+            
+            # Force load all attributes before expunge
+            for appointment in appointments:
+                _ = appointment.id
+                _ = appointment.patient_id
+                _ = appointment.appointment_date
+                _ = appointment.reason
+                _ = appointment.status
+                _ = appointment.notes
+                if appointment.patient:
+                    _ = appointment.patient.full_name
+                session.expunge(appointment)
+            
+            return appointments
         finally:
             session.close()
     
     def get_overdue_appointments(self) -> List[Appointment]:
         """
-        Get all overdue appointments (past date and still PENDING)
+        Get all overdue appointments (past date and PENDING or already OVERDUE)
         This is used for dashboard alerts
         """
         session = self.db_manager.get_session()
         try:
             today = date.today()
             
-            # Get pending appointments that are past due
+            # Get appointments that are overdue (past date and PENDING or OVERDUE status)
             overdue = session.query(Appointment)\
                 .options(joinedload(Appointment.patient))\
                 .filter(and_(
                     Appointment.appointment_date < today,
-                    Appointment.status == "PENDING"
+                    or_(
+                        Appointment.status == "PENDING",
+                        Appointment.status == "OVERDUE"
+                    )
                 ))\
                 .order_by(Appointment.appointment_date)\
                 .all()
             
-            # Auto-update status to OVERDUE
+            # Auto-update PENDING to OVERDUE
             for appointment in overdue:
-                appointment.status = "OVERDUE"
+                if appointment.status == "PENDING":
+                    appointment.status = "OVERDUE"
             
             session.commit()
+            
+            # Force load all attributes before expunge
+            for appointment in overdue:
+                _ = appointment.id
+                _ = appointment.patient_id
+                _ = appointment.appointment_date
+                _ = appointment.reason
+                _ = appointment.status
+                _ = appointment.notes
+                if appointment.patient:
+                    _ = appointment.patient.full_name
+                session.expunge(appointment)
             
             return overdue
         finally:

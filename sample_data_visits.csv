@@ -1,0 +1,6 @@
+patient_code,visit_date,symptoms,diagnosis,conclusion
+BN001,25/01/2026,Sốt cao 39°C từ 2 ngày,Cảm cúm,Nghỉ ngơi và uống thuốc theo đơn
+BN001,28/01/2026,Tái khám - đã bớt sốt,Cảm cúm đỡ,Tiếp tục uống thuốc 3 ngày
+BN002,26/01/2026,Đau đầu và chóng mặt,Tăng huyết áp,Theo dõi huyết áp hàng ngày
+BN003,27/01/2026,Ho khan kéo dài,Viêm họng,Uống thuốc và tái khám sau 5 ngày
+BN004,28/01/2026,Đau bụng,Viêm dạ dày,Ăn nhẹ và uống thuốc kháng acid

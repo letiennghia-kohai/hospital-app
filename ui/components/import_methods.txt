@@ -1,0 +1,113 @@
+# Import Panel Helper Methods
+# These will be added to import_panel.py
+
+def import_medicines(self):
+    """Import medicines from file"""
+    dialog = ColumnMappingDialog(
+        self,
+        title="Ánh Xạ Cột - Thuốc",
+        file_path=self.selected_file,
+        import_type="medicine"
+    )
+    dialog.wait_window()
+    
+    if not dialog.result:
+        return
+    
+    try:
+        result = self.import_service.import_medicines(
+            self.selected_file,
+            dialog.result,
+            skip_duplicates=True
+        )
+        self.show_import_result(result)
+    except Exception as e:
+        messagebox.showerror("Lỗi", f"Không thể nhập dữ liệu: {str(e)}")
+
+def import_test_types(self):
+    """Import test types from file"""
+    dialog = ColumnMappingDialog(
+        self,
+        title="Ánh Xạ Cột - Loại Xét Nghiệm",
+        file_path=self.selected_file,
+        import_type="test_type"
+    )
+    dialog.wait_window()
+    
+    if not dialog.result:
+        return
+    
+    try:
+        result = self.import_service.import_test_types(
+            self.selected_file,
+            dialog.result,
+            skip_duplicates=True
+        )
+        self.show_import_result(result)
+    except Exception as e:
+        messagebox.showerror("Lỗi", f"Không thể nhập dữ liệu: {str(e)}")
+
+def import_visits(self):
+    """Import visits from file"""
+    dialog = ColumnMappingDialog(
+        self,
+        title="Ánh Xạ Cột - Lần Khám",
+        file_path=self.selected_file,
+        import_type="visit"
+    )
+    dialog.wait_window()
+    
+    if not dialog.result:
+        return
+    
+    try:
+        result = self.import_service.import_visits(
+            self.selected_file,
+            dialog.result
+        )
+        self.show_import_result(result)
+    except Exception as e:
+        messagebox.showerror("Lỗi", f"Không thể nhập dữ liệu: {str(e)}")
+
+def import_test_results(self):
+    """Import test results from file"""
+    dialog = ColumnMappingDialog(
+        self,
+        title="Ánh Xạ Cột - Kết Quả XN",
+        file_path=self.selected_file,
+        import_type="test_result"
+    )
+    dialog.wait_window()
+    
+    if not dialog.result:
+        return
+    
+    try:
+        result = self.import_service.import_test_results_batch(
+            self.selected_file,
+            dialog.result
+        )
+        self.show_import_result(result)
+    except Exception as e:
+        messagebox.showerror("Lỗi", f"Không thể nhập dữ liệu: {str(e)}")
+
+def show_import_result(self, result):
+    """Show import result message"""
+    if result['success']:
+        message = f"""
+Nhập dữ liệu thành công!
+
+Tổng số dòng: {result['total']}
+Đã nhập: {result['imported']}
+Bỏ qua: {result['skipped']}
+        """
+        
+        if result['errors']:
+            message += f"\n\nLỗi ({len(result['errors'])} dòng):\n"
+            message += "\n".join(result['errors'][:5])
+            if len(result['errors']) > 5:
+                message += f"\n... và {len(result['errors']) - 5} lỗi khác"
+        
+        messagebox.showinfo("Thành Công", message.strip())
+    else:
+        messagebox.showerror("Lỗi", result.get('error', 'Unknown error'))

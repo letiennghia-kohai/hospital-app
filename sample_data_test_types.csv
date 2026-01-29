@@ -1,0 +1,6 @@
+name,unit,normal_range_min,normal_range_max,notes
+Glucose,mg/dL,70,110,Đường huyết lúc đói
+Hemoglobin,g/dL,12,16,Huyết sắc tố
+Cholesterol,mg/dL,0,200,Cholesterol toàn phần
+Triglycerides,mg/dL,0,150,Chất béo trung tính
+Creatinine,mg/dL,0.6,1.2,Chức năng thận

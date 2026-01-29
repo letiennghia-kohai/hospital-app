@@ -1,0 +1,7 @@
+patient_code,test_type_name,test_date,result_value,notes
+BN001,Glucose,25/01/2026,105,Đường huyết bình thường
+BN001,Hemoglobin,25/01/2026,14.5,Huyết sắc tố tốt
+BN002,Cholesterol,26/01/2026,220,Hơi cao - cần kiểm soát chế độ ăn
+BN002,Triglycerides,26/01/2026,165,Cao - cần giảm chất béo
+BN003,Glucose,27/01/2026,95,Bình thường
+BN004,Creatinine,28/01/2026,0.9,Chức năng thận tốt

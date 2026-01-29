@@ -16,11 +16,12 @@ class VisitService:
         self.db_manager = get_db_manager()
     
     def create_visit(self, patient_id: int, visit_date: date,
-                    symptoms: str = None, diagnosis: str = None,
-                    conclusion: str = None, notes: str = None) -> Visit:
-        """Create a new visit record"""
-        with self.db_manager.session_scope() as session:
-            visit = Visit(
+                     symptoms: str = None, diagnosis: str = None,
+                     conclusion: str = None, notes: str = None) -> Visit:
+        """Create a new visit"""
+        session = self.db_manager.get_session()
+        try:
+            new_visit = Visit(
                 patient_id=patient_id,
                 visit_date=visit_date,
                 symptoms=symptoms,
@@ -28,10 +29,21 @@ class VisitService:
                 conclusion=conclusion,
                 notes=notes
             )
-            session.add(visit)
-            session.flush()
-            session.refresh(visit)
-            return visit
+            session.add(new_visit)
+            session.commit()
+            
+            # Get the visit ID before closing session
+            visit_id = new_visit.id
+            session.close()
+            
+            # Return fresh visit with eager loaded patient
+            return self.get_visit_by_id(visit_id)
+        except Exception as e:
+            session.rollback()
+            raise e
+        finally:
+            if session.is_active:
+                session.close()
     
     def get_visit_by_id(self, visit_id: int) -> Optional[Visit]:
         """Get visit by ID with related data"""
